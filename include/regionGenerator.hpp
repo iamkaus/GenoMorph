@@ -1,61 +1,92 @@
-#ifndef REGION_GENERATOR_H
-#define REGION_GENERATOR_H
+#pragma once
 
 #include <string>
 #include <random>
 #include <array>
+#include <optional>
+#include <vector>
 
 /**
- * @struct RegionState
- * @brief Represents the state and properties of a genomic region.
+ * --------------------------------------------------------------
+ * NOTE: CODING REGION METADATA
+ * --------------------------------------------------------------
+ */
+
+/**
+ * @struct CodingMetaData
+ * @brief Struct with reading_frame as its member it described one of the three possible way to parse a nucleotide as a codon.
  * 
- * This struct is used to define regions of DNA with specific characteristics
- * such as type (coding or non-coding), GC content, and length.
-*/
+ * Codon -> a codon is a consecutive non-overlapping triplet of nucleotide.
+ */
 
-struct RegionState {
-
+struct CodingMetaData { 
     /**
-     * @brief The starting index of the region in the genome.
-     * Zero-based index.
-    */
-    size_t start_index;
+     * NODE: READING_FREAME -> can either be (1,2,3), (-1,-2,-3) or ORF (has a start codon [ATG] and an end codon [TAA,TAG, TGA])
+     */
+    int8_t reading_frame;
+};
 
-    /**
-     * @brief The ending index of the region in the genome.
-     * Zero-based index.
-    */
-    size_t end_index;
+/**
+ * --------------------------------------------------------
+ * NOTE: NON-CODING REGION METADATA
+ * --------------------------------------------------------
+ */
 
+struct RegulatoryMetaData { 
     /**
-     * @brief Target GC or AT content for the region.
-     * Value between 0.35 to 0.45 for GC content and 0.65 to 0.55 for AT content representing the fraction of G and C bases.
-    */
-    double target_content;
+     * NOTE: ACCESSIBILITY -> between 0.0 - 1.0
+     */
+    double accessibility;
+};
 
-    /**
-     * @brief The current GC or AT content generated in the region.
-     * Used to track percentage progress towards the target_content.
-    */
-    double current_content;
+/**
+ * --------------------------------------------------------
+ * NOTE: common metadata for both regions
+ * --------------------------------------------------------
+ */
 
-    /**
-     * @brief The current length of the region to be generated.
-     * Number of bases in the region.
-    */
-    size_t current_length_generated;
+enum class FeatureType {
+    coding,
+    non_coding,
+    regulatory,
+    repeat
+};
 
-    /**
-     * @brief The target length of the region to be generated.
-     * Number of bases in the region.
-    */
-    size_t target_length;
+enum class StrandInfo {plus, minus};
 
-    /**
-     * @brief The type of the region: "coding" or "non_coding".
-     * Determines the characteristics of the region.
-    */
-    std::string region_type;
+/**
+ * NOTE: RegionPlan -> structural roadmap to DNA regions with common shared metadata
+ */
+
+struct RegionPlan {
+    size_t       region_start_index;
+    size_t       region_end_index;
+    StrandInfo   strand;
+    
+    size_t RegionLength () const { return region_end_index - region_start_index + 1; }
+};
+
+/**
+ * NOTE: BaseRegionInfo -> common shared metadata for base pairs
+ */
+
+struct BaseRegionInfo {
+    FeatureType     type;
+    RegionPlan      region_plan;
+    double          AT_CONTENT =         0.0;
+    double          GC_CONTENT =         0.0;
+};
+
+/**
+ * --------------------------------------------------------
+ * NOTE: region based metadata
+ * --------------------------------------------------------
+ */
+
+struct RegionInfo {
+    BaseRegionInfo                                  base;
+    std::optional<CodingMetaData>                   coding;
+    std::optional<RegulatoryMetaData>               regulatory_meta_data;
 };
 
 class RegionGenerator {
@@ -78,12 +109,12 @@ public:
      * @brief Creates a new genomic region based on the current genome length and total genome length.
      * @param currentGenomeLength The length of the genome generated so far.
      * @param genomeLength The total desired length of the genome.
-     * @return A RegionState struct representing the newly created region.
+     * @return A RegionInfo struct representing the newly created region.
      * Throws std::invalid_argument if genomeLength is less than 100.
      * The function randomly decides the type of region (coding or non-coding),
      * its target GC or AT content, and its length based on predefined probabilities and distributions.
     */
-    RegionState createRegion(size_t currentGenomeLength, size_t genomeLength);
+    RegionInfo createRegion(size_t currentGenomeLength, size_t genomeLength);
 
     /**
      * @brief Provides base probabilities based on the region type.
@@ -97,7 +128,7 @@ public:
      * The design allows for easy modification of base probabilities in the future.
      * Overall, this function encapsulates the logic for region-specific base probability determination.
      */
-    std::array<double, 4> regionBasedBaseProbabilities(const RegionState &region);
+    std::array<double, 4> regionBasedBaseProbabilities(const RegionInfo &region);
 
     /**
      * --------------------------------------------------------------------------
@@ -112,7 +143,5 @@ public:
      * --------------------------------------------------------------------------
      */
 
-     void print_region_probabilities(const RegionState& region);
+     void print_region_probabilities(const RegionInfo& region);
 };
-
-#endif // REGION_GENERATOR_H
