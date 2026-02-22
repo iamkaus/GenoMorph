@@ -108,8 +108,6 @@ public:
      * @param genomeLength The total desired length of the genome.
      * @return A RegionInfo struct representing the newly created region.
      * Throws std::invalid_argument if genomeLength is less than 100.
-     * The function randomly decides the type of region (coding or non-coding),
-     * its target GC or AT content, and its length based on predefined probabilities and distributions.
     */
     RegionInfo createRegion(size_t currentGenomeLength, size_t genomeLength);
 
@@ -120,25 +118,6 @@ public:
      * This function adjusts base probabilities to reflect the characteristics of the region.
      * For coding regions, higher GC content is favored, while non-coding regions favor AT content.
      * The returned probabilities can be used in base generation to ensure the sequence adheres to the region's properties.
-     * The sum of the returned probabilities should ideally be 1.0.
-     * This function is crucial for generating biologically relevant sequences.
-     * The design allows for easy modification of base probabilities in the future.
-     * Overall, this function encapsulates the logic for region-specific base probability determination.
      */
     std::array<double, 4> regionBasedBaseProbabilities(const RegionInfo &region);
-
-    /**
-     * --------------------------------------------------------------------------
-     * 
-     * 
-     * The function print_region_probabilities(const RegionState& region) is not fundamentally necessary for the core functionality of the RegionGenerator class.
-     * However, it can be a useful utility function for debugging and verification purposes.
-     * It allows developers to easily inspect the base probabilities associated with a given region, ensuring that the probabilities align with the expected values based on the region's type and target content.
-     * This can help in validating that the region generation logic is functioning correctly and that the probabilities are being calculated as intended.
-     * 
-     * 
-     * --------------------------------------------------------------------------
-     */
-
-     void print_region_probabilities(const RegionInfo& region);
 };
