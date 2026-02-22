@@ -7,14 +7,8 @@
 #include <vector>
 
 /**
- * --------------------------------------------------------------
- * NOTE: CODING REGION METADATA
- * --------------------------------------------------------------
- */
-
-/**
  * @struct CodingMetaData
- * @brief Struct with reading_frame as its member it described one of the three possible way to parse a nucleotide as a codon.
+ * @brief struct with reading_frame as its member it described one of the three possible way to parse a nucleotide as a codon.
  * 
  * Codon -> a codon is a consecutive non-overlapping triplet of nucleotide.
  */
@@ -27,9 +21,8 @@ struct CodingMetaData {
 };
 
 /**
- * --------------------------------------------------------
- * NOTE: NON-CODING REGION METADATA
- * --------------------------------------------------------
+ * @struct RegulatoryMetaData
+ * @brief the struct refers to non-coding information embedded within genome that dictates [when, where and how much] a gene is "expressed". 
  */
 
 struct RegulatoryMetaData { 
@@ -40,17 +33,22 @@ struct RegulatoryMetaData {
 };
 
 /**
- * --------------------------------------------------------
- * NOTE: common metadata for both regions
- * --------------------------------------------------------
+ * @enum FeatureType
+ * @brief enum FeatureType consists of integral constants to determine feature type of nucleotide bases.
  */
 
 enum class FeatureType {
+
     coding,
     non_coding,
     regulatory,
     repeat
 };
+
+/**
+ * @enum StrandInfo
+ * @brief it provides information regarding a convention to specify which of the two strand in a double stranded DNA molecule contains a specific gene of sequence feature.
+ */
 
 enum class StrandInfo {plus, minus};
 
@@ -78,9 +76,8 @@ struct BaseRegionInfo {
 };
 
 /**
- * --------------------------------------------------------
- * NOTE: region based metadata
- * --------------------------------------------------------
+ * @struct RegionInfo
+ * @brief conveys information regarding region bases and whethere the region is coding or non-coding depending upon optional members.
  */
 
 struct RegionInfo {
